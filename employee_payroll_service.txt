@@ -32,8 +32,7 @@ mysql> select salary from employeepayroll where name="bill";
 +---------+
 1 row in set (0.00 sec)
 
-mysql> select name ,start, salary from employeepayroll where start between cast(
-"2018-01-05"as Date)and Date(now());
+mysql> select name ,start, salary from employeepayroll where start between cast("2018-01-05"as Date)and Date(now());
 +---------+------------+---------+
 | name    | start      | salary  |
 +---------+------------+---------+
@@ -92,3 +91,193 @@ mysql> select count(salary)from employeepayroll group by gender;
 |             2 |
 +---------------+
 2 rows in set (0.17 sec)
+
+
+
+UC8->
+
+
+mysql> alter table employeepayroll add phoneNo int(10) after name;
+Query OK, 0 rows affected (1.57 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employeepayroll add address varchar(210) after phoneNo;
+Query OK, 0 rows affected (1.34 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employeepayroll add department varchar(210)not null after address;
+Query OK, 0 rows affected (1.30 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employeepayroll alter address set default 'TBD';
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select *from employeepayroll;
++----+---------+---------+---------+------------+--------+---------+------------
++
+| id | name    | phoneNo | address | department | gender | salary  | start
+|
++----+---------+---------+---------+------------+--------+---------+------------
++
+|  1 | bill    |    NULL | NULL    |            | M      | 1000000 | 2018-01-03
+|
+|  2 | terisa  |    NULL | NULL    |            | F      | 2000000 | 2019-11-13
+|
+|  3 | charlie |    NULL | NULL    |            | M      | 3000000 | 2020-05-21
+|
++----+---------+---------+---------+------------+--------+---------+------------
++
+3 rows in set (0.00 sec)
+
+
+UC9->
+
+mysql> alter table employeepayroll change column salary basicPay double;
+Query OK, 0 rows affected (2.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from employeepayroll;
++----+---------+---------+---------+------------+--------+----------+-----------
+-+
+| id | name    | phoneNo | address | department | gender | basicPay | start
+ |
++----+---------+---------+---------+------------+--------+----------+-----------
+-+
+|  1 | bill    |    NULL | NULL    |            | M      |  1000000 | 2018-01-03
+ |
+|  2 | terisa  |    NULL | NULL    |            | F      |  2000000 | 2019-11-13
+ |
+|  3 | charlie |    NULL | NULL    |            | M      |  3000000 | 2020-05-21
+ |
++----+---------+---------+---------+------------+--------+----------+-----------
+-+
+
+mysql> alter table employeepayroll add column deductions Double not null after basicPay;
+Query OK, 0 rows affected (1.14 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employeepayroll add column taxablePay Double not null after deductions;
+Query OK, 0 rows affected (1.32 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employeepayroll add column incomeTax Double not null after taxablepay;
+
+Query OK, 0 rows affected (1.37 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table employeepayroll add column netPay Double not null after incomeTax;
+Query OK, 0 rows affected (1.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from employeepayroll where name="terisa";
+
+
+UC10->
+mysql> insert into employeepayroll(name,department,gender,basicPay,deductions,taxablePay,incomeTax,netPay,start)value('Terisa','marketing','F', 3000000.0,100000.0,100000.0,10000.0,500000.0,"2018-01-23");
+Query OK, 1 row affected (0.09 sec)
+
+
+UC11->
+
+mysql> create table Company(companyName varchar(100));
+Query OK, 0 rows affected (0.85 sec)
+
+mysql> insert into Company values("morningstar");
+Query OK, 1 row affected (0.14 sec)
+
+mysql> create table employee(empId int(10) not null auto_increment, empName varchar(50) not null, phoneNo varchar(10) not null, address varchar(200) not null,primary key (empId));
+Query OK, 0 rows affected (0.59 sec)
+
+mysql> insert into employee(empName,phoneNo,address)values("kshitija","7028453145","mirjole"),("amruta","7588133145","bhatye"("onkar","9834452118", "satara");
+Query OK, 3 rows affected (0.14 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> alter table employee add column gender char(1);
+Query OK, 0 rows affected (1.35 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> update employee set gender='F' where empName="kshitija" or empName="amrut
+a";
+Query OK, 2 rows affected (0.09 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+mysql> update employee set gender='M' where empName="onkar";
+Query OK, 1 row affected (0.16 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> create table department(deptId int(10) not null, empId int(50) , deptName varchar(10) not null);
+Query OK, 0 rows affected (0.86 sec)
+
+mysql> alter table department add foreign key (empId) references employee (empId);
+Query OK, 3 rows affected (2.10 sec)
+
+Records: 3  Duplicates: 0  Warnings: 0
+mysql> insert into department(deptId,deptName)values(1,"finance"),(2,"sales"),(3,"Marketing");
+Query OK, 3 rows affected (0.09 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+
+mysql> create table payroll( basePay Double not null,netPay Double not null , taxablePay Double not null,tax Double not null);
+Query OK, 0 rows affected (0.56 sec)
+
+mysql> alter table payroll add column empId int(10);
+Query OK, 0 rows affected (0.88 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table payroll add foreign key (empId) references employee (e
+Query OK, 3 rows affected (1.50 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> insert into payroll values(300000.0,5000000.0,2000000.0,200000.0),(400000.0,6000000.0,300000.0,30000.0)(500000.0,6000000.0,400000.0,40000.0);
+Query OK, 3 rows affected (0.10 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+UC12->
+
+
+mysql> select * from employee;
+
+mysql> select * from department;
+
+mysql> select * from company;
+
+mysql> select * from payroll;
+
+mysql> select netPay from payroll where tax=200000;
+
+
+mysql> select phoneNo from employee where empName="kshitija"or empName="amruta";
+
+mysql> select count(empName) from employee group by gender;
++----------------+
+| count(empName) |
++----------------+
+|              2 |
+|              1 |
++----------------+
+2 rows in set (0.06 sec)
+
+mysql> select max(netPay) from payroll;
++-------------+
+| max(netPay) |
++-------------+
+|     6000000 |
++-------------+
+1 row in set (0.00 sec)
+
+mysql> select min(basePay) from payroll;
++--------------+
+| min(basePay) |
++--------------+
+|       300000 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> select avg(tax) from payroll;
++----------+
+| avg(tax) |
++----------+
+|    90000 |
++----------+
+1 row in set (0.00 sec)
